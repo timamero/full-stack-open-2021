@@ -1,5 +1,16 @@
 import React, { useState } from 'react'
 
+const Button = ({handleClick, text}) => <button onClick={handleClick}>{text}</button>
+
+const Display = ({anecdote, points}) => {
+  return (
+    <div>
+      {anecdote}
+      <p>Has {points} votes</p>
+    </div> 
+  )
+}
+
 const App = () => {
   const anecdotes = [
     'If it hurts, do it more often',
@@ -14,7 +25,7 @@ const App = () => {
   const [selected, setSelected] = useState(0)
   const [points, setPoints] = useState(Array(7).fill(0))
   const copyPoints = [...points]
-  console.log('points: ', copyPoints)
+  // console.log(copyPoints)
   const handleSelectedClick = () => setSelected(Math.floor(Math.random() * 7));
   const handlePointsClick = () => {
     copyPoints[selected]++
@@ -23,22 +34,17 @@ const App = () => {
 
   const max =  Math.max(...points)
   const indexOfMax = points.indexOf(max)
-  console.log('max', max)
-  console.log('index of max: ', indexOfMax)
 
   return (
     <div>
       <h1>Software Engineering Anecdotes</h1>
-      <button onClick={handleSelectedClick}>Get Random Anecdote</button>
+      <Button handleClick={handleSelectedClick} text="Get Random Anecdote" />
       <br />
       <br />
-      {anecdotes[selected]}
-      <p>Has {points[selected]} votes</p>
-      <button onClick={handlePointsClick}>Vote</button>
-    
+      <Display anecdote={anecdotes[selected]} points={points[selected]} />
+      <Button handleClick={handlePointsClick} text="Vote" />
       <h2>Anecdote with the most votes</h2>
-      {anecdotes[indexOfMax]}
-      <p>Has {points[indexOfMax]} votes</p>
+      <Display anecdote={anecdotes[indexOfMax]} points={points[indexOfMax]} />
     </div>
   )
 }
