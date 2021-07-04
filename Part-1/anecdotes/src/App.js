@@ -13,16 +13,18 @@ const App = () => {
    
   const [selected, setSelected] = useState(0)
   const [points, setPoints] = useState(Array(7).fill(0))
-  console.log('points: ', points)
-
   const copyPoints = [...points]
-
-
+  console.log('points: ', copyPoints)
   const handleSelectedClick = () => setSelected(Math.floor(Math.random() * 7));
   const handlePointsClick = () => {
     copyPoints[selected]++
     setPoints(copyPoints)
   }
+
+  const max =  Math.max(...points)
+  const indexOfMax = points.indexOf(max)
+  console.log('max', max)
+  console.log('index of max: ', indexOfMax)
 
   return (
     <div>
@@ -33,6 +35,10 @@ const App = () => {
       {anecdotes[selected]}
       <p>Has {points[selected]} votes</p>
       <button onClick={handlePointsClick}>Vote</button>
+    
+      <h2>Anecdote with the most votes</h2>
+      {anecdotes[indexOfMax]}
+      <p>Has {points[indexOfMax]} votes</p>
     </div>
   )
 }
