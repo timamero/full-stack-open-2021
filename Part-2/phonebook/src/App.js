@@ -4,21 +4,27 @@ function App() {
   const [ persons, setPersons ] = useState([
     { name: 'Arto Hellas'}
   ])
+  console.log('persons list: ', persons)
   const [ newName, setNewName ] = useState('')
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log('submitted form')
-    const personObject = {
+    
+    const nameList = persons.map(person => person.name)
+    
+    if (nameList.includes(newName)) {
+      alert(event.target.value + ' is already added to phonebook')
+    } else {
+      const personObject = {
       name: newName
-    }
+      }
 
-    setPersons(persons.concat(personObject))
-    setNewName('')
+      setPersons(persons.concat(personObject))
+      setNewName('')
+    }
   }
 
   const handleNameChange = (event) => {
-    console.log(event.target.value)
     setNewName(event.target.value)
   }
   
