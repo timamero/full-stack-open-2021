@@ -13,7 +13,7 @@ function App() {
     const nameList = persons.map(person => person.name)
     
     if (nameList.includes(newName)) {
-      alert(event.target.value + ' is already added to phonebook')
+      alert(`${newName} is already added to phonebook`)
     } else {
       const personObject = {
       name: newName
