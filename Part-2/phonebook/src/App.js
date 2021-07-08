@@ -2,10 +2,10 @@ import React, { useState } from "react";
 
 function App() {
   const [ persons, setPersons ] = useState([
-    { name: 'Arto Hellas'}
+    { name: 'Arto Hellas', phone: '123-456-7890'}
   ])
-  console.log('persons list: ', persons)
   const [ newName, setNewName ] = useState('')
+  const [ newPhone, setNewPhone ] = useState('')
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -16,16 +16,22 @@ function App() {
       alert(`${newName} is already added to phonebook`)
     } else {
       const personObject = {
-      name: newName
+      name: newName,
+      phone: newPhone
       }
 
       setPersons(persons.concat(personObject))
       setNewName('')
+      setNewPhone('')
     }
   }
 
   const handleNameChange = (event) => {
     setNewName(event.target.value)
+  }
+
+  const handlePhoneChange = (event) => {
+    setNewPhone(event.target.value)
   }
   
   return (
@@ -34,6 +40,7 @@ function App() {
       <form onSubmit={handleSubmit}>
         <div>
           name: <input onChange={handleNameChange} value={newName}/>
+          phone: <input onChange={handlePhoneChange} value={newPhone} />
         </div>
         <div>
           <button type="submit">add</button>
@@ -42,7 +49,7 @@ function App() {
       <h2>Numbers</h2>
       <ul>
         {persons.map(person => (
-          <li key={person.name}>{person.name}</li>
+          <li key={person.name}>{person.name} {person.phone}</li>
           )
         )}
       </ul>
