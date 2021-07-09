@@ -1,6 +1,42 @@
 import React, { useState } from "react";
 
-function App() {
+const Filter = ({handleFilterChange, filter}) => {
+  return <div>filter shown with: <input onChange={handleFilterChange} value={filter}/></div>
+}
+
+const PersonForm = ({handleSubmit, handleNameChange, handleNumberChange, newName, newNumber}) => {
+  return (
+    <form onSubmit={handleSubmit}>
+        <div>
+          name: <input onChange={handleNameChange} value={newName}/>
+        </div>
+        <div>
+          phone: <input onChange={handleNumberChange} value={newNumber} />
+        </div>
+        <div>
+          <button type="submit">add</button>
+        </div>
+      </form>
+  )
+}
+
+const Person = ({name, number}) => {
+  return <li>{name} {number}</li>
+}
+
+const Persons = ({personsToShow}) => {
+  return (
+    <ul>
+      {personsToShow.map(person => (
+        <Person key={person.name} name={person.name} number={person.number} />
+        )
+      )}
+    </ul>
+  )
+}
+
+
+const App = () => {
   const [ persons, setPersons ] = useState([
     { name: 'Arto Hellas', number: '040-123456' },
     { name: 'Ada Lovelace', number: '39-44-5323523' },
@@ -8,7 +44,7 @@ function App() {
     { name: 'Mary Poppendieck', number: '39-23-6423122' }
   ])
   const [ newName, setNewName ] = useState('')
-  const [ newPhone, setNewPhone ] = useState('')
+  const [ newNumber, setNewNumber ] = useState('')
   const [ filter, setFilter ] = useState('')
 
   const handleSubmit = (event) => {
@@ -21,12 +57,12 @@ function App() {
     } else {
       const personObject = {
       name: newName,
-      phone: newPhone
+      number: newNumber
       }
 
       setPersons(persons.concat(personObject))
       setNewName('')
-      setNewPhone('')
+      setNewNumber('')
     }
   }
 
@@ -34,8 +70,8 @@ function App() {
     setNewName(event.target.value)
   }
 
-  const handlePhoneChange = (event) => {
-    setNewPhone(event.target.value)
+  const handleNumberChange = (event) => {
+    setNewNumber(event.target.value)
   }
 
   const handleFilterChange = (event) => {
@@ -47,28 +83,17 @@ function App() {
   return (
     <div>
       <h2>Phonebook</h2>
-      <div>
-          filter shown with: <input onChange={handleFilterChange} value={filter}/>
-      </div>
+      <Filter handleFilterChange={handleFilterChange} filter={filter} />
       <h2>Add new person</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          name: <input onChange={handleNameChange} value={newName}/>
-        </div>
-        <div>
-          phone: <input onChange={handlePhoneChange} value={newPhone} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <PersonForm 
+        handleSubmit={handleSubmit}
+        handleNameChange={handleNameChange}
+        handleNumberChange={handleNumberChange}
+        newName={newName}
+        newNumber={newNumber}
+      />
       <h2>Numbers</h2>
-      <ul>
-        {personsToShow.map(person => (
-          <li key={person.name}>{person.name} {person.phone}</li>
-          )
-        )}
-      </ul>
+      <Persons personsToShow={personsToShow} />
     </div>
   );
 }
