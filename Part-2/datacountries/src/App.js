@@ -10,6 +10,7 @@ const FilterForm = ({value, handleChange}) => {
 }
 
 const CountryDetails = ({country}) => {
+  console.log(country.name)
   return (
     <div>
       <h2>{country.name}</h2>
@@ -22,15 +23,19 @@ const CountryDetails = ({country}) => {
   )
 }
 
-const CountryListing = ({name}) => {
+const CountryListing = ({name, handleChange}) => {
   return (
-    <li>{name}</li>
+    <li>
+      {name}
+      <button type="submit" value={name} onClick={handleChange}>show</button>
+    </li>
   )
 }
 
 const App = () => {
   const [filter, setFilter] = useState('')
   const [countries, setCountries] = useState([])
+  const [showCountryFromList, setShowCountryFromList] = useState('')
 
   useEffect(() => {
     axios
@@ -42,10 +47,27 @@ const App = () => {
 
   const handleFilterChange = (event) => {
     setFilter(event.target.value)
+    if (filter === '') {
+      setShowCountryFromList('')
+    }
+  }
+
+  const handleShowCountryChange = (event) => {
+    setShowCountryFromList(event.target.value)
   }
   
   const countriesToShow = countries.filter(country => country.name.toLowerCase().includes(filter.toLowerCase()))
 
+  const getCountryByName = (object) => object.name === showCountryFromList;
+
+  const indexOfCountry = countriesToShow.findIndex(getCountryByName)
+  console.log(filter)
+  if (countriesToShow.length < 11) {
+    console.log('countriesToShow', countriesToShow)
+  }
+  
+  console.log('showCountryFromList', showCountryFromList)
+  console.log('index', indexOfCountry)
   return (
     <div>
       <FilterForm value={filter} handleChange={handleFilterChange} />
@@ -56,10 +78,15 @@ const App = () => {
             ? countriesToShow.length === 1
             ? <CountryDetails country={countriesToShow[0]} />
             : countriesToShow.map(country => (
-                <CountryListing key={country.name} name={country.name} />
+                <CountryListing key={country.name} name={country.name} handleChange={handleShowCountryChange}/>
               ))
           : null
         }
+      </div>
+      <div>
+        {showCountryFromList !== '' && filter !== ''
+        ? <CountryDetails country={countriesToShow[indexOfCountry]} />
+        : null}
       </div>
     </div>
   );
