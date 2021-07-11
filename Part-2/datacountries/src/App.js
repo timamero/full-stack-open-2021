@@ -1,0 +1,68 @@
+import React, { useState, useEffect } from 'react'
+import axios from 'axios'
+
+const FilterForm = ({value, handleChange}) => {
+  return (
+    <form>
+        Find countries: <input value={value} onChange={handleChange} />
+    </form>
+  )
+}
+
+const CountryDetails = ({country}) => {
+  return (
+    <div>
+      <h2>{country.name}</h2>
+      <p>capital: {country.capital}</p>
+      <p>population: {country.population}</p>
+      <h3>Languages</h3>
+      {country.languages.map(language => <li key={language.name}>{language.name}</li>)}
+      <img src={country.flag} alt="Country flag" style={{width: "100px"}}/>
+    </div>
+  )
+}
+
+const CountryListing = ({name}) => {
+  return (
+    <li>{name}</li>
+  )
+}
+
+const App = () => {
+  const [filter, setFilter] = useState('')
+  const [countries, setCountries] = useState([])
+
+  useEffect(() => {
+    axios
+      .get('https://restcountries.eu/rest/v2/all')
+      .then(response => {
+        setCountries(response.data)
+      })
+  }, [])
+
+  const handleFilterChange = (event) => {
+    setFilter(event.target.value)
+  }
+  
+  const countriesToShow = countries.filter(country => country.name.toLowerCase().includes(filter.toLowerCase()))
+
+  return (
+    <div>
+      <FilterForm value={filter} handleChange={handleFilterChange} />
+      <div>
+        {countriesToShow.length > 10 && filter !== ''
+          ? <p>Too many matches, specify another filter</p>
+          : filter !== ''
+            ? countriesToShow.length === 1
+            ? <CountryDetails country={countriesToShow[0]} />
+            : countriesToShow.map(country => (
+                <CountryListing key={country.name} name={country.name} />
+              ))
+          : null
+        }
+      </div>
+    </div>
+  );
+}
+
+export default App;
