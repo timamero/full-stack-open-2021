@@ -10,7 +10,6 @@ const FilterForm = ({value, handleChange}) => {
 }
 
 const CountryDetails = ({country}) => {
-  console.log(country.name)
   return (
     <div>
       <h2>{country.name}</h2>
@@ -35,7 +34,14 @@ const CountryListing = ({name, handleChange}) => {
 const App = () => {
   const [filter, setFilter] = useState('')
   const [countries, setCountries] = useState([])
-  const [showCountryFromList, setShowCountryFromList] = useState('')
+  const [countryToShowDetails, setCountryToShowDetails] = useState('')
+  const [weatherData, setWeatherData] = useState({})
+
+  const countriesToShow = countries.filter(country => country.name.toLowerCase().includes(filter.toLowerCase()))
+
+  const getCountryByName = (object) => object.name === countryToShowDetails;
+
+  const indexOfCountry = countriesToShow.findIndex(getCountryByName)
 
   useEffect(() => {
     axios
@@ -45,49 +51,56 @@ const App = () => {
       })
   }, [])
 
+  useEffect(() => {
+    if (countryToShowDetails === '') {
+        return
+    }
+
+    const params = {
+      access_key: process.env.REACT_APP_WEATHERSTACK_KEY,
+      query: countryToShowDetails
+    }
+    axios
+      .get('http://api.weatherstack.com/current', {params})
+      .then(response => {
+        setWeatherData(response.data)
+      })
+  }, [countryToShowDetails])
+
   const handleFilterChange = (event) => {
     setFilter(event.target.value)
+
+    
+    
     if (filter === '') {
-      setShowCountryFromList('')
+      setCountryToShowDetails('')
     }
   }
-
+  
   const handleShowCountryChange = (event) => {
-    setShowCountryFromList(event.target.value)
-  }
-  
-  const countriesToShow = countries.filter(country => country.name.toLowerCase().includes(filter.toLowerCase()))
+    setCountryToShowDetails(event.target.value)
+    
+  }  
 
-  const getCountryByName = (object) => object.name === showCountryFromList;
-
-  const indexOfCountry = countriesToShow.findIndex(getCountryByName)
-  console.log(filter)
-  if (countriesToShow.length < 11) {
-    console.log('countriesToShow', countriesToShow)
-  }
+  console.log('weather', weatherData.current)
   
-  console.log('showCountryFromList', showCountryFromList)
-  console.log('index', indexOfCountry)
   return (
     <div>
       <FilterForm value={filter} handleChange={handleFilterChange} />
       <div>
         {countriesToShow.length > 10 && filter !== ''
           ? <p>Too many matches, specify another filter</p>
-          : filter !== ''
-            ? countriesToShow.length === 1
-            ? <CountryDetails country={countriesToShow[0]} />
-            : countriesToShow.map(country => (
+          : countriesToShow.length !== 1 && filter !== ''
+            ? countriesToShow.map(country => (
                 <CountryListing key={country.name} name={country.name} handleChange={handleShowCountryChange}/>
               ))
           : null
         }
       </div>
-      <div>
-        {showCountryFromList !== '' && filter !== ''
-        ? <CountryDetails country={countriesToShow[indexOfCountry]} />
-        : null}
-      </div>
+      {countriesToShow.length === 1 && filter !== ''
+        ? <CountryDetails country={countriesToShow[0]}/>
+        : countryToShowDetails !== '' && filter !== ''
+        ? <CountryDetails country={countriesToShow[indexOfCountry]}/> : null}
     </div>
   );
 }
