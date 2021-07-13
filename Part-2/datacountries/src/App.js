@@ -34,19 +34,19 @@ const CountryListing = ({name, handleChange}) => {
 const App = () => {
   const [filter, setFilter] = useState('')
   const [countries, setCountries] = useState([])
-  const [matchedOneCountry, setMatchedOneCountry] = useState(false)
   const [countryToShowDetails, setCountryToShowDetails] = useState('')
   const [weatherData, setWeatherData] = useState(null)
 
   const countriesToShow = countries.filter(country => country.name.toLowerCase().includes(filter.toLowerCase()))
-  const countryToShow = countryToShowDetails 
-    ? countryToShowDetails 
-    : countriesToShow.length === 1 
-    ? countriesToShow[0].name
-    : null
 
-  const getCountryByName = (object) => object.name === countryToShow;
+  const getCountryByName = (object) => object.name === countryToShowDetails;
   const indexOfCountry = countriesToShow.findIndex(getCountryByName)
+
+  useEffect(() => {
+    if (countriesToShow.length === 1) {
+      setCountryToShowDetails(countriesToShow[0].name)
+    }
+  }, [countriesToShow])
 
   useEffect(() => {
     axios
@@ -58,24 +58,25 @@ const App = () => {
 
   useEffect(() => {
     console.log('weather effect')
-    if (countryToShow === null) {
+    if (countryToShowDetails === '') {
       console.log('exit')
       return;
     }
     console.log('passed conditional')
     const params = {
       access_key: process.env.REACT_APP_WEATHERSTACK_KEY,
-      query: countryToShow
+      query: countryToShowDetails
     }
     axios
       .get('http://api.weatherstack.com/current', {params})
       .then(response => {
         setWeatherData(response.data)
       })
-  }, [countryToShow])
+  }, [countryToShowDetails])
 
   const handleFilterChange = (event) => {
     setFilter(event.target.value)
+    console.log('handleFilter')
 
     if (filter === '') {
       setCountryToShowDetails('')
@@ -87,6 +88,7 @@ const App = () => {
   const handleShowCountryChange = (event) => {
     setCountryToShowDetails(event.target.value)
   }
+  console.log('length before render', countriesToShow.length)
 
   return (
     <div>
@@ -101,7 +103,7 @@ const App = () => {
           : null
         }
       </div>
-      {countryToShow && filter !== ''
+      {countryToShowDetails && filter !== ''
         ? 
           <div>
             <CountryDetails country={countriesToShow[indexOfCountry]}/>
