@@ -34,13 +34,18 @@ const CountryListing = ({name, handleChange}) => {
 const App = () => {
   const [filter, setFilter] = useState('')
   const [countries, setCountries] = useState([])
+  const [matchedOneCountry, setMatchedOneCountry] = useState(false)
   const [countryToShowDetails, setCountryToShowDetails] = useState('')
-  const [weatherData, setWeatherData] = useState({})
+  const [weatherData, setWeatherData] = useState(null)
 
   const countriesToShow = countries.filter(country => country.name.toLowerCase().includes(filter.toLowerCase()))
+  const countryToShow = countryToShowDetails 
+    ? countryToShowDetails 
+    : countriesToShow.length === 1 
+    ? countriesToShow[0].name
+    : null
 
-  const getCountryByName = (object) => object.name === countryToShowDetails;
-
+  const getCountryByName = (object) => object.name === countryToShow;
   const indexOfCountry = countriesToShow.findIndex(getCountryByName)
 
   useEffect(() => {
@@ -52,38 +57,37 @@ const App = () => {
   }, [])
 
   useEffect(() => {
-    if (countryToShowDetails === '') {
-        return
+    console.log('weather effect')
+    if (countryToShow === null) {
+      console.log('exit')
+      return;
     }
-
+    console.log('passed conditional')
     const params = {
       access_key: process.env.REACT_APP_WEATHERSTACK_KEY,
-      query: countryToShowDetails
+      query: countryToShow
     }
     axios
       .get('http://api.weatherstack.com/current', {params})
       .then(response => {
         setWeatherData(response.data)
       })
-  }, [countryToShowDetails])
+  }, [countryToShow])
 
   const handleFilterChange = (event) => {
     setFilter(event.target.value)
 
-    
-    
     if (filter === '') {
       setCountryToShowDetails('')
+      setWeatherData(null)
     }
+    
   }
   
   const handleShowCountryChange = (event) => {
     setCountryToShowDetails(event.target.value)
-    
-  }  
+  }
 
-  console.log('weather', weatherData.current)
-  
   return (
     <div>
       <FilterForm value={filter} handleChange={handleFilterChange} />
@@ -97,10 +101,20 @@ const App = () => {
           : null
         }
       </div>
-      {countriesToShow.length === 1 && filter !== ''
-        ? <CountryDetails country={countriesToShow[0]}/>
-        : countryToShowDetails !== '' && filter !== ''
-        ? <CountryDetails country={countriesToShow[indexOfCountry]}/> : null}
+      {countryToShow && filter !== ''
+        ? 
+          <div>
+            <CountryDetails country={countriesToShow[indexOfCountry]}/>
+            {weatherData ? 
+              <div>
+                <h2>Weather in {weatherData.location.country}</h2>
+                <p>Temperature: {weatherData.current.temperature} Celsius</p>
+                <img src={weatherData.current.weather_icons} alt="Weather icon" />
+                <p>Wind: {weatherData.current.wind_speed} kmh direction {weatherData.current.wind_dir}</p>
+              </div> 
+            : null}
+          </div>
+        : null}
     </div>
   );
 }
