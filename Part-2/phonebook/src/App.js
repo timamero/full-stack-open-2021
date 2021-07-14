@@ -40,7 +40,6 @@ const Persons = ({personsToShow, handleDelete}) => {
   )
 }
 
-
 const App = () => {
   const [ persons, setPersons ] = useState([])
   const [ newName, setNewName ] = useState('')
@@ -59,9 +58,7 @@ const App = () => {
     
     const nameList = persons.map(person => person.name)
     
-    if (nameList.includes(newName)) {
-      alert(`${newName} is already added to phonebook`)
-    } else {
+    if (!nameList.includes(newName)) {
       const personObject = {
       name: newName,
       number: newNumber
@@ -73,8 +70,22 @@ const App = () => {
           setNewName('')
           setNewNumber('')
         })
-
+    
+    } else {
+      const number = persons.find(person => person.name === newName).number
+      if (number === newNumber) {
+        alert(`${newName} is already added to phonebook`) 
       
+      } else {
+        if (window.confirm(`${newName} is already in the phonebook, replace the old number with the new number?`)) {
+          const obj = persons.find(person => person.name === newName)
+          const changedObj = {...obj, number: newNumber}
+          personsServices.update(obj.id, changedObj)
+            .then(response => {
+              setPersons(persons.map(person => person.name !== newName ? person : response.data))
+            })
+        }
+      }  
     }
   }
 

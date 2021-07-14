@@ -14,5 +14,9 @@ const deleteObj = objId => {
     return axios.delete(`${baseUrl}/${objId}`)
 }
 
-const personsServices = { getAll, create, deleteObj }
+const update = (objId, object) => {
+    return axios.put(`${baseUrl}/${objId}`, object)
+}
+
+const personsServices = { getAll, create, deleteObj, update }
 export default personsServices;
