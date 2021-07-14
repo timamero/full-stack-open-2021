@@ -21,15 +21,19 @@ const PersonForm = ({handleSubmit, handleNameChange, handleNumberChange, newName
   )
 }
 
-const Person = ({name, number}) => {
-  return <li>{name} {number}</li>
-}
+const Person = ({name, number, handleDelete}) => {
+  return (
+    <li>
+        {name} {number}
+        <button value={name} onClick={handleDelete}>Delete?</button>
+    </li>
+  )}
 
-const Persons = ({personsToShow}) => {
+const Persons = ({personsToShow, handleDelete}) => {
   return (
     <ul>
       {personsToShow.map(person => (
-        <Person key={person.name} name={person.name} number={person.number} />
+        <Person key={person.name} name={person.name} number={person.number} handleDelete={handleDelete}/>
         )
       )}
     </ul>
@@ -86,6 +90,16 @@ const App = () => {
     setFilter(event.target.value)
   }
 
+  const handleDelete = (event) => {
+    if (window.confirm(`Do you want to delete the information for ${event.target.value}`)) {
+      const obj = persons.find(person => person.name === event.target.value)
+      personsServices.deleteObj(obj.id)
+        .then(() => {
+          setPersons(persons.filter(person => person.id !== obj.id))
+        })
+    }
+  }
+
   const personsToShow = persons.filter(person => person.name.toLowerCase().includes(filter.toLowerCase()))
   
   return (
@@ -101,7 +115,7 @@ const App = () => {
         newNumber={newNumber}
       />
       <h2>Numbers</h2>
-      <Persons personsToShow={personsToShow} />
+      <Persons personsToShow={personsToShow} handleDelete={handleDelete}/>
     </div>
   );
 }
