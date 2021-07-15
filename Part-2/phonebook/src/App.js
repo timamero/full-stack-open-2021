@@ -45,6 +45,18 @@ const App = () => {
   const [ newName, setNewName ] = useState('')
   const [ newNumber, setNewNumber ] = useState('')
   const [ filter, setFilter ] = useState('')
+  const [ successMessage, setSuccessMessage ] = useState('')
+
+  const successMessageStyle = {
+    border: "2px solid #29A33B",
+    borderRadius: 5,
+    padding: 8,
+    marginTop: 16,
+    marginBottom: 16,
+    width: "max-content",
+    fontSize: 30,
+    color: "#29A33B"
+  }
 
   useEffect(() => {
     personsServices.getAll()
@@ -69,6 +81,11 @@ const App = () => {
           setPersons(persons.concat(response.data))
           setNewName('')
           setNewNumber('')
+        }).then(() => {
+          setSuccessMessage(`Added ${personObject.name}`)
+          setTimeout(() => {
+            setSuccessMessage(null)
+          }, 5000)
         })
     
     } else {
@@ -112,10 +129,14 @@ const App = () => {
   }
 
   const personsToShow = persons.filter(person => person.name.toLowerCase().includes(filter.toLowerCase()))
-  
+
   return (
     <div>
       <h2>Phonebook</h2>
+      {successMessage 
+        ? <div style={successMessageStyle}>{successMessage}</div> 
+        : null
+      }
       <Filter handleFilterChange={handleFilterChange} filter={filter} />
       <h2>Add new person</h2>
       <PersonForm 
