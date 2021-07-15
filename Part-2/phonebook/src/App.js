@@ -46,16 +46,27 @@ const App = () => {
   const [ newNumber, setNewNumber ] = useState('')
   const [ filter, setFilter ] = useState('')
   const [ successMessage, setSuccessMessage ] = useState('')
+  const [ errorMessage, setErrorMessage ] = useState('')
 
-  const successMessageStyle = {
-    border: "2px solid #29A33B",
+  const messageStyle = {
     borderRadius: 5,
     padding: 8,
     marginTop: 16,
     marginBottom: 16,
     width: "max-content",
-    fontSize: 30,
+    fontSize: 20
+  }
+
+  const successMessageStyle = {
+    ...messageStyle,
+    border: "2px solid #29A33B",
     color: "#29A33B"
+  }
+
+  const errorMessageStyle = {
+    ...messageStyle,
+    border: "2px solid #A32929",
+    color: "#A32929"
   }
 
   useEffect(() => {
@@ -85,7 +96,7 @@ const App = () => {
           setSuccessMessage(`Added ${personObject.name}`)
           setTimeout(() => {
             setSuccessMessage(null)
-          }, 5000)
+          }, 3000)
         })
     
     } else {
@@ -124,6 +135,12 @@ const App = () => {
       personsServices.deleteObj(obj.id)
         .then(() => {
           setPersons(persons.filter(person => person.id !== obj.id))
+        }).catch(error => {
+          console.log(error)
+          setErrorMessage(`Information of ${obj.name} has already been removed from server`)
+          setTimeout(() => {
+            setErrorMessage('')
+          }, 3000)
         })
     }
   }
@@ -135,7 +152,9 @@ const App = () => {
       <h2>Phonebook</h2>
       {successMessage 
         ? <div style={successMessageStyle}>{successMessage}</div> 
-        : null
+        : errorMessage 
+          ? <div style={errorMessageStyle}>{errorMessage}</div>
+          : null
       }
       <Filter handleFilterChange={handleFilterChange} filter={filter} />
       <h2>Add new person</h2>
